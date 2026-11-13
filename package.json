@@ -1,6 +1,6 @@
 {
   "name": "opencode-turn-usage",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Per-turn model token accounting for OpenCode Desktop and terminal",
   "type": "module",
   "engines": {

@@ -177,7 +177,7 @@ async function collect(client, rootID, signal) {
           warnings.push("History-page limit reached; totals are partial.");
           break;
         }
-        const page = await client.message.list({ sessionID: id, limit: 100, order: "asc", cursor }, { signal });
+        const page = await client.message.list({ sessionID: id, limit: 100, ...cursor ? { cursor } : { order: "asc" } }, { signal });
         messages2.push(...page.data.map(redact));
         cursor = page.cursor.next ?? void 0;
         if (cursor && cursors.has(cursor)) throw new Error("Repeated history cursor");
@@ -191,7 +191,7 @@ async function collect(client, rootID, signal) {
           warnings.push("Family-page limit reached; totals are partial.");
           break;
         }
-        const page = await client.session.list({ parentID: id, limit: 200, order: "asc", cursor }, { signal });
+        const page = await client.session.list({ parentID: id, limit: 200, ...cursor ? { cursor } : { order: "asc" } }, { signal });
         for (const child of page.data) {
           if (child.parentID === id) await visit(child.id);
         }

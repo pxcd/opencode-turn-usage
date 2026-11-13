@@ -48,3 +48,23 @@ test("controller ignores token streaming and unrelated sessions, batches termina
   listener({ type: "session.execution.succeeded", data: { sessionID: "ses_root" } });
   await sleep(15); assert.equal(states.length, count);
 });
+
+
+test("child-session pagination follows cursor without repeating order", async () => {
+  const children = Array.from({ length: 3 }, (_, i) => s(`ses_child${i}`, [u(`msg_cu${i}`, i + 3), a(`msg_ca${i}`, i + 4, usage(), qwen)], "ses_root"));
+  const { client, calls } = fakeClient([s("ses_root", [u("msg_u", 1)]), ...children], 1);
+  const report = await collect(client, "ses_root");
+  assert.equal(report.sessionIDs.length, 4);
+  assert.equal(calls.filter(c => c === "children:ses_root").length, 3);
+  assert.equal(report.totals[0]!.calls, 3);
+  assert.ok(!report.warnings.some(w => /could not be read/.test(w)));
+});
+
+test("long multi-page chats include every recorded call exactly once", async () => {
+  const messages = [u("msg_u", 1), ...Array.from({ length: 205 }, (_, i) => a(`msg_a${String(i).padStart(4, "0")}`, i + 2)), idle("msg_i", 208)];
+  const { client, calls } = fakeClient([s("ses_root", messages)], 100);
+  const report = await collect(client, "ses_root");
+  assert.equal(report.totals[0]!.calls, 205);
+  assert.equal(report.totals[0]!.tokens.input.known, 2050);
+  assert.equal(calls.filter(c => c === "messages:ses_root").length, 3);
+});

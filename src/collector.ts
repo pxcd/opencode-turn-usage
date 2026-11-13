@@ -39,7 +39,7 @@ export async function collect(client: UsageClient, rootID: string, signal?: Abor
       const cursors = new Set<string>();
       do {
         if (++pages > 500) { warnings.push("History-page limit reached; totals are partial."); break; }
-        const page = await client.message.list({ sessionID: id, limit: 100, order: "asc", cursor }, { signal });
+        const page = await client.message.list({ sessionID: id, limit: 100, ...(cursor ? { cursor } : { order: "asc" as const }) }, { signal });
         messages.push(...page.data.map(redact));
         cursor = page.cursor.next ?? undefined;
         if (cursor && cursors.has(cursor)) throw new Error("Repeated history cursor");
@@ -50,7 +50,7 @@ export async function collect(client: UsageClient, rootID: string, signal?: Abor
       cursors.clear();
       do {
         if (++pages > 500) { warnings.push("Family-page limit reached; totals are partial."); break; }
-        const page = await client.session.list({ parentID: id, limit: 200, order: "asc", cursor }, { signal });
+        const page = await client.session.list({ parentID: id, limit: 200, ...(cursor ? { cursor } : { order: "asc" as const }) }, { signal });
         for (const child of page.data) {
           if (child.parentID === id) await visit(child.id);
         }

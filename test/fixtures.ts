@@ -26,13 +26,15 @@ export function fakeClient(snapshots: SessionSnapshot[], pageSize = 100) {
       async get({ sessionID }: { sessionID: string }) {
         calls.push(`get:${sessionID}`); const s = index.get(sessionID); if (!s) throw new Error("missing"); return s.info;
       },
-      async list({ parentID, cursor }: { parentID: string; cursor?: string }) {
+      async list({ parentID, cursor, order }: { parentID: string; cursor?: string; order?: string }) {
+        if (cursor !== undefined && order !== undefined) throw new Error("Cursor cannot be combined with order");
         calls.push(`children:${parentID}`); const rows = snapshots.filter(s => s.info.parentID === parentID).map(s => s.info);
         const start = Number(cursor ?? 0); const data = rows.slice(start, start + pageSize);
         return { data, cursor: { next: start + pageSize < rows.length ? String(start + pageSize) : undefined } };
       },
     },
-    message: { async list({ sessionID, cursor }: { sessionID: string; cursor?: string }) {
+    message: { async list({ sessionID, cursor, order }: { sessionID: string; cursor?: string; order?: string }) {
+      if (cursor !== undefined && order !== undefined) throw new Error("Cursor cannot be combined with order");
       calls.push(`messages:${sessionID}`); const rows = index.get(sessionID)!.messages;
       const start = Number(cursor ?? 0); const data = rows.slice(start, start + pageSize);
       return { data, cursor: { next: start + pageSize < rows.length ? String(start + pageSize) : undefined } };
