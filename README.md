@@ -7,10 +7,10 @@ The plugin adds a compact Desktop bottom strip and an expandable **Turn usage** 
 ## Install from Git (after publishing a release)
 
 ```sh
-opencode plugin add 'github:pxcd/opencode-turn-usage#v0.1.0'
+opencode plugin add 'git+ssh://git@github.com/pxcd/opencode-turn-usage.git#v0.1.1'
 ```
 
-The command requires the repository and `v0.1.0` tag to have been pushed. Install into your own OpenCode only when its current work is finished: configuration changes can reload plugins. Follow the documented [package installer](https://opencode.ai/docs/plugins/). Pin a reviewed release or full commit; OpenCode's package installer manages its installed copy separately from a development checkout. Private repos use your existing Git access; the plugin stores no credentials.
+The command requires the repository and `v0.1.1` tag to have been pushed. Install into your own OpenCode only when its current work is finished: configuration changes can reload plugins. Follow the documented [package installer](https://opencode.ai/docs/plugins/). Pin a reviewed release or full commit; OpenCode's package installer manages its installed copy separately from a development checkout. Private repos use your existing Git access; the plugin stores no credentials.
 
 The Git repository must include **dist/** with the built GUI bundle, terminal entry and accounting library. No build/install lifecycle script is required on the workstation consuming it. Do not use a filesystem path when you want an independently installed package. Remove an installed package with `opencode plugin remove <the-installed-package-spec>`.
 
@@ -48,3 +48,9 @@ Refresh is event-driven and debounced, not polled and not triggered by token del
 - [GUI plugin API and supported slots](https://opencode.ai/docs/build/plugins/gui/)
 - [Terminal plugin API](https://opencode.ai/docs/build/plugins/cli/)
 - Pinned upstream source: [`v2.2.7`](https://github.com/anomalyco/opencode/tree/v2.2.7), especially `packages/schema/src/token-usage.ts`, `session-message.ts`, and `packages/core/src/tool/plugin/subagent.ts`.
+
+## Git installation compatibility
+
+The development build command is `npm run build:plugin`. Do not add a script named `build`, `prepare`, `prepack`, `preinstall`, `install`, or `postinstall`, or a `workspaces` field, to this prebuilt release package. npm's Git fetcher treats these as preparation triggers even when lifecycle scripts are disabled. OpenCode 2.2.7's embedded installer then invokes its own executable with npm flags, causing `git dep preparation failed` / `Unrecognized flag: --force`. Version 0.1.1 avoids that preparation path; version 0.1.0 retains this known installation defect.
+
+The offline Git-install regression test exercises both the failing trigger and the corrected package with the same Arborist/Pacote dependency path. Native OpenCode CLI reproduction and acceptance use separate disposable XDG profiles; they do not register the plugin in the user's real configuration.

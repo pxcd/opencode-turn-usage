@@ -1,6 +1,6 @@
 {
   "name": "opencode-turn-usage",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Per-turn model token accounting for OpenCode Desktop and terminal",
   "type": "module",
   "engines": {
@@ -16,11 +16,11 @@
     "./accounting": "./dist/accounting.js"
   },
   "scripts": {
-    "build": "node scripts/build.mjs",
     "test": "node --conditions=browser --import tsx --test test/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run build && npm test && npm run check:package",
-    "check:package": "node scripts/check-package.mjs"
+    "check": "npm run typecheck && npm run build:plugin && npm test && npm run check:package",
+    "check:package": "node scripts/check-package.mjs",
+    "build:plugin": "node scripts/build.mjs"
   },
   "peerDependencies": {
     "@opencode/plugin": "2.2.7",
