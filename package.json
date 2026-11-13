@@ -1,0 +1,54 @@
+{
+  "name": "opencode-turn-usage",
+  "version": "0.1.0",
+  "description": "Per-turn model token accounting for OpenCode Desktop and terminal",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    "./gui-experimental": "./dist/gui-experimental.cjs",
+    "./tui": "./dist/tui.js",
+    "./accounting": "./dist/accounting.js"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --conditions=browser --import tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run build && npm test && npm run check:package",
+    "check:package": "node scripts/check-package.mjs"
+  },
+  "peerDependencies": {
+    "@opencode/plugin": "2.2.7",
+    "solid-js": ">=1.9.17"
+  },
+  "peerDependenciesMeta": {
+    "@opencode/plugin": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@opencode/plugin": "2.2.7",
+    "@types/jsdom": "27.0.0",
+    "@types/node": "24.19.2",
+    "esbuild": "0.25.12",
+    "jsdom": "27.4.0",
+    "solid-js": "1.9.17",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vite": "6.4.6",
+    "vite-plugin-solid": "2.11.0"
+  },
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pxcd/opencode-turn-usage.git"
+  }
+}
